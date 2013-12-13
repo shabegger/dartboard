@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Dartboard</title>
+		<style type="text/css">
+			html, body {
+				margin: 0;
+				padding: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="dartboard" height="600px" width="600px"></canvas>
+		<script>
+			var canvas = document.getElementById('dartboard'),
+				context = canvas.getContext('2d'),
+				numbers = [10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5, 20, 1, 18, 4, 13, 6],
+				i, len, x, y, angle, numIndex, number,
+				textSize, numberText,
+				color1, color2,
+				angle1, angle2;
+			
+			context.beginPath();
+			context.arc(300, 300, 252, 0, 2 * Math.PI);
+			context.closePath();
+			context.fillStyle = '#ffff00';
+			context.fill();
+			
+			function drawSection(angle1, angle2, outerRadius, innerRadius, color) {
+				var outerPadding = 2 / outerRadius,
+					innerPadding = 2 / innerRadius;
+				
+				context.beginPath();
+				context.arc(300, 300, outerRadius, angle1 + outerPadding, angle2 - outerPadding);
+				context.arc(300, 300, innerRadius, angle2 - innerPadding, angle1 + innerPadding, true);
+				context.closePath();
+				context.fillStyle = color;
+				context.fill();
+			}
+			
+			for (i = 0, len = 20; i < len; i++) {
+				if (i % 2 === 0) {
+					color1 = '#000000';
+					color2 = '#ff0000';
+				} else {
+					color1 = '#ff0000';
+					color2 = '#000000';
+				}
+				
+				angle1 = (0.05 + (0.1 * i)) * Math.PI;
+				angle2 = (0.15 + (0.1 * i)) * Math.PI;
+				
+				drawSection(angle1, angle2, 248, 222, color1);
+				drawSection(angle1, angle2, 218, 152, color2);
+				drawSection(angle1, angle2, 148, 122, color1);
+				drawSection(angle1, angle2, 118, 52, color2);
+			}
+			
+			context.beginPath();
+			context.arc(300, 300, 48, 0, 2 * Math.PI);
+			context.arc(300, 300, 27, 2 * Math.PI, 0, true);
+			context.closePath();
+			context.fillStyle = '#ff0000';
+			context.fill();
+			
+			context.beginPath();
+			context.arc(300, 300, 23, 0, 2 * Math.PI);
+			context.closePath();
+			context.fillStyle = '#000000';
+			context.fill();
+			
+			context.font = '40px Segoe UI';
+			for (i = 0, len = numbers.length; i < len; i++) {
+				numberText = numbers[i].toString();
+				textSize = context.measureText(numberText);
+				
+				angle = (0.1 + (0.1 * i)) * Math.PI;
+				x = (Math.cos(angle) * 280) - (textSize.width / 2) + 300;
+				y = (Math.sin(angle) * 280) + 15 + 300;
+				
+				context.fillText(numberText, x, y);
+			}
+			
+			canvas.addEventListener('click', function (e) {
+				var x = e.clientX - 300,
+					y = e.clientY - 300,
+					radius = Math.sqrt((x * x) + (y * y)),
+					angle;
+				
+				if (radius < 25) {
+					alert('Double Bull!');
+					return;
+				}
+				
+				if (radius < 50) {
+					alert ('Bullseye!');
+					return;
+				}
+				
+				if (x === 0) {
+					if (y > 0) {
+						angle = 0.5 * Math.PI;
+					} else {
+						angle = 1.5 * Math.PI;
+					}
+				} else {
+					angle = Math.atan(y / x);
+					if (x < 0) {
+						angle += Math.PI;
+					} else if (y < 0) {
+						angle += 2 * Math.PI;
+					}
+				}
+				
+				numIndex = (Math.round(10 * (angle / Math.PI)) + 19) % 20;
+				number = numbers[numIndex];
+				
+				if (radius > 120 && radius < 150) {
+					alert(['Triple ', number, '!'].join(''));
+				} else if (radius > 220 && radius < 250) {
+					alert(['Double ', number, '!'].join(''));
+				} else if (radius < 250) {
+					alert(number);
+				}
+			});
+		</script>
+	</body>
+</html>
