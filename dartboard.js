@@ -222,7 +222,7 @@
         var i, len;
 
         for (i = 0, len = this._handlers.length; i < len; i++) {
-            this._handlers[i](event);
+            this._handlers[i].call(this, event);
         }
     }
 
